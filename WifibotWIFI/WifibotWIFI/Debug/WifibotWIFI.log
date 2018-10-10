@@ -1,0 +1,5 @@
+﻿  main.cpp
+  WifibotClient.cpp
+d:\users\theo\documents\visual studio workplace\wifibotwifi\wifibotwifi\wifibotclient.cpp(910): warning C4805: '==' : mélange risqué de type 'unsigned int' et de type 'bool' dans l'opération
+  Génération de code en cours...
+  WifibotWIFI.vcxproj -> D:\Users\Theo\Documents\visual studio workplace\WifibotWIFI\Debug\WifibotWIFI.exe
