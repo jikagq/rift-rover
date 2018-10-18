@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "WifibotClient.h"
+#include "Robot_Fonction.h"
 
 #define IP_ADRESSE "192.168.1.75"
 #define PORT	15020
@@ -19,95 +20,50 @@ int SharpLUT[]={150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,
           30,29,29,29,29,29,29,29,28,28,28,28,28,28,27,27,27,27,27,27,27,26,26,26,26,25,25,25,25,25,25,24,24,24,24,24,23,23,23,
           23,23,23,22,22,22,22,22,21,21,21,21,21,21,20,20,20,20,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,16,16,15,15};
 
-void Robot_Avancer(UINT16 vitesse_gauche, UINT16 vitesse_droite)
-{
-	unsigned char flags = 128 + 32 + 64 + 16 + 1;
-	robot.SendCommand(vitesse_gauche, vitesse_droite, flags);
-}
-
-void Robot_Reculer(UINT16 vitesse_gauche, UINT16 vitesse_droite)
-{
-	unsigned char flags = 128 + 0 + 32 + 0 + 1;
-	robot.SendCommand(vitesse_gauche, vitesse_droite, flags);
-}
-
-void Robot_Tourner_Gauche(UINT16 vitesse_gauche, UINT16 vitesse_droite)
-{
-	unsigned char flags = 128 + 0 + 32 + 16 + 1;
-	robot.SendCommand(vitesse_gauche, vitesse_droite, flags);
-}
-
-void Robot_Tourner_Droite(UINT16 vitesse_gauche, UINT16 vitesse_droite)
-{
-	unsigned char flags = 128 + 64 + 32 + 0 + 1;
-	robot.SendCommand(vitesse_gauche, vitesse_droite, flags);
-}
-
-void Robot_Arreter(UINT16 vitesse_gauche, UINT16 vitesse_droite)
-{
-	unsigned char flags = 128 + 64 + 32 + 16 + 1;
-	robot.SendCommand(vitesse_gauche, vitesse_droite, flags);
-}
-
-void Wifibot_CapteurIR() 
-{
-		printf("IRLeft : %d\n", sensors_data.IRLeft);
-		printf("IRRight : %d\n", sensors_data.IRRight);
-
-		// Test IR left
-		//if (sensors_data.IRLeft < IR_SEUIL) {
-		//	Robot_Arreter();
-		//}
-
-		// Test IR Right
-		//if (sensors_data.IRRight < IR_SEUIL) {
-		//	Robot_Arreter();
-		//}
-}
 
 void main(void)
 {
 	/*.........................*/
 	/* Connection to the robot */
 	/*.........................*/
-		
-	bool rep = robot.ConnectToRobot(IP_ADRESSE, PORT);
-	if( rep )
-	{
-		printf("Connection failed...\n");
-		getchar();
-		return;
-	}
-	else
-	{
-		printf("Connection established...\n");
-	}
+	Robot_Connexion();
 
 
 	/*..............*/
 	/* Main program */
 	/*..............*/
-	
 	SensorData sensors_data;
 	while(1)
 	{
 		Robot_Avancer(255, 255);
 		robot.GetSensorData(&sensors_data);
+		//printf("Batterie : %d\n", sensors_data.BatVoltage);
 		printf("IRLeft : %d\n", sensors_data.IRLeft);
 		printf("IRRight : %d\n", sensors_data.IRRight);
 
-		// Test IR left
-		while (sensors_data.IRLeft > IR_SEUIL || sensors_data.IRRight > IR_SEUIL)
+		// Premier test afin de vérifier que les capteurs détectent bien
+		Detection_obstacle();
+		
+		// Deuxième test : Détecter le côté dans lequel le robot doit aller
+		if (Robot_obstacleDroite())
 		{
-			Robot_Arreter(0,0);
-			robot.GetSensorData(&sensors_data);
-			printf("IRLeft : %d\n", sensors_data.IRLeft);
-			printf("IRRight : %d\n", sensors_data.IRRight);
+			do
+			{
+				Robot_Tourner_Gauche(255, 0);
+				robot.GetSensorData(&sensors_data);
+			} while (Robot_obstacleDroite());
 		}
-		robot.GetSensorData(&sensors_data);
-		//printf("Batterie : %d\n", sensors_data.BatVoltage);
-		
-		
+		else 
+		{
+			do
+			{
+				Robot_Tourner_Droite(255, 0);
+				robot.GetSensorData(&sensors_data);
+			} while (Robot_obstacleGauche());
+		}
 		//Sleep(100);
 	}	
 }
+
+
+
