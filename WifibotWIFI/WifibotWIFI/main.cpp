@@ -51,13 +51,18 @@ void Robot_Arreter(UINT16 vitesse_gauche, UINT16 vitesse_droite)
 
 
 
-/*avec tick*/
 void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
 {
 	int val_tick_droite = 0;
 	int val_tick_gauche = 0;
+	int val_tick_droite_depart =0;
+	int val_tick_gauche_depart =0;
+	
+	robot.GetSensorData(&sensors_data);//aquisition
+	val_tick_droite = val_tick_droite_depart = sensors_data.OdometryRight;//actualisation
+	val_tick_gauche = val_tick_gauche_depart = sensors_data.OdometryLeft;//actualisation
 
-	while ((val_tick_droite < consigne_tick) && (val_tick_gauche < consigne_tick)) {
+	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {
 
 		Robot_Avancer(vitesse_gauche, vitesse_droite);
 		robot.GetSensorData(&sensors_data);//aquisition
@@ -65,9 +70,10 @@ void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 	}
 	Robot_Arreter(0, 0);
+	
 }
 
-void Robot_Reculer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
+/*void Robot_Reculer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
 {
 	int val_tick_droite = 0;
 	int val_tick_gauche = 0;
@@ -80,12 +86,18 @@ void Robot_Reculer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 	}
 	Robot_Arreter(0, 0);
-}
+}*/
 
-void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
+void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)//normalement fonctionne en relatif
 {
-	int val_tick_droite = 0; //variable du tick mesuré
-	while (val_tick_droite < consigne_tick) {
+	int val_tick_droite = 0;
+	int val_tick_droite_depart =0;
+	
+	robot.GetSensorData(&sensors_data);//aquisition
+	val_tick_droite = val_tick_droite_depart = sensors_data.OdometryRight;
+	
+	
+	while (val_tick_droite < consigne_tick + val_tick_droite_depart) {
 
 		Robot_Tourner_Gauche(vitesse_gauche, vitesse_droite);
 		robot.GetSensorData(&sensors_data);//aquisition
@@ -94,10 +106,15 @@ void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 	Robot_Arreter(0, 0);
 }
 
-void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
+void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)//normalement fonctionne en relatif
 {
 	int val_tick_gauche = 0; //variable du tick mesuré
-	while (val_tick_gauche < consigne_tick) {
+	int val_tick_gauche_depart =0;
+	
+	robot.GetSensorData(&sensors_data);//aquisition
+	val_tick_gauche = val_tick_gauche_depart = sensors_data.OdometryLeft;
+	
+	while (val_tick_gauche < consigne_tick + val_tick_gauche_depart) {
 
 		Robot_Tourner_Droite(vitesse_gauche, vitesse_droite);
 		robot.GetSensorData(&sensors_data);//aquisition
