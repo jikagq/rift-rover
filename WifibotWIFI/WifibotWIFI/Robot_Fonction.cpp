@@ -82,12 +82,19 @@ bool Robot_obstacleGauche()
 	}
 }
 
-void Detection_obstacle()
+bool Detection_obstacle()
 {
-	while (sensors_data.IRLeft > IR_SEUIL || sensors_data.IRRight > IR_SEUIL)
+	/**while (sensors_data.IRLeft > IR_SEUIL || sensors_data.IRRight > IR_SEUIL)
 	{
 		Robot_Arreter(0, 0);
 		robot.GetSensorData(&sensors_data);
+	}**/
+	
+	if (sensors_data.IRLeft > IR_SEUIL || sensors_data.IRRight > IR_SEUIL) {
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 
@@ -159,4 +166,13 @@ void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 		Sleep(100);
 	}
 	Robot_Arreter(0, 0);
+}
+
+void updatesensors(void) {
+	robot.GetSensorData(&sensors_data);
+	printf("IRLeft : %d\n", sensors_data.IRLeft);
+	printf("IRRight : %d\n", sensors_data.IRRight);
+	printf("odoLeft : %d\n", sensors_data.OdometryLeft);
+	printf("odoRight : %d\n", sensors_data.OdometryRight);
+	printf("Batterie : %d\n", sensors_data.BatVoltage);
 }

@@ -20,57 +20,27 @@ void main(void)
 	/*..............*/
 	while(1)
 	{
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/**Robot_Avancer(255, 255);
-		robot.GetSensorData(&sensors_data);
-		//printf("Batterie : %d\n", sensors_data.BatVoltage);
-		printf("IRLeft : %d\n", sensors_data.IRLeft);
-		printf("IRRight : %d\n", sensors_data.IRRight);
+		updatesensors();
 
-		// Premier test afin de vérifier que les capteurs détectent bien
-		Detection_obstacle();
+		Robot_Avancer(255, 255);
 		
-		// Deuxième test : Détecter le côté dans lequel le robot doit aller
-		if (Robot_obstacleDroite())
-		{
-			do
-			{
-				Robot_Tourner_Gauche(255, 0);
-				robot.GetSensorData(&sensors_data);
-			} while (Robot_obstacleDroite());
+		
+	
+		if(Robot_obstacleDroite()) {
+			//Robot_Tourner_Gauche(255, 0);
+			Robot_Tourner_Gauche_avec_tick(50,-50,2000);
+			Robot_Avancer_avec_tick(50, 50, 5000);
+			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
 		}
-		else 
-		{
-			do
-			{
-				Robot_Tourner_Droite(255, 0);
-				robot.GetSensorData(&sensors_data);
-			} while (Robot_obstacleGauche());
+		
+		if (Robot_obstacleGauche()) {
+			//Robot_Tourner_Droite(255, 0);
+			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
+			Robot_Avancer_avec_tick(50, 50, 5000);
+			Robot_Tourner_Gauche_avec_tick(50, -50, 2000);
 		}
-		//Sleep(100);**/
+		
+		Sleep(100);
 	}	
 }
 
