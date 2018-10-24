@@ -8,6 +8,10 @@
 #define IP_ADRESSE "192.168.1.75"
 #define PORT	15020
 
+/*depart en 0,0 donc test d'une augmenation des valeur de +combien ?*/
+#define lim_x 10000
+#define lim_y 500
+
 
 position pos;//variable position de type pos
 
@@ -18,9 +22,6 @@ int IR_SEUIL = 100;
 double old_droite = 0;
 double old_gauche = 0;
 int entraxe = 10;//mesure entraxe des roues
-
-long lim_x;
-long lim_y;
 
 
 void Robot_Connexion()
@@ -193,6 +194,9 @@ void updatesensors(void) {
 	printf("x : %f\n", getx(&pos));
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
+	
+	
+	verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
 }
 
 
@@ -203,7 +207,7 @@ void updatesensors(void) {
 
 /* mise a jour la nouvelle position du robot (x, y, O)
  * par approximation de segment de droite */
-void calcul_position_segment(position *p, double distance, double angle)
+void calcul_position_segment(position *p, double distance, double angle)/*pas utiliser ici*/
 {
 	p->x += distance * cos(p->O);
 	p->y += distance * sin(p->O);
@@ -235,9 +239,9 @@ void calcul_position_arc(position *p, double distance, double angle)
 		yo = p->y + r * cos(p->O);
 
 		/* coordonnees du robot */
-		p->O += a;
-		p->x = xo + r * sin(p->O);
-		p->y = yo - r * cos(p->O);
+		p->O += a;//orientation
+		p->x = xo + r * sin(p->O);//x
+		p->y = yo - r * cos(p->O);//y
 
 		//printf("x: %d y: %d O: %d\n", p->x, p->y, p->O);
 	}
@@ -257,7 +261,8 @@ void odometrie(position *p, signed short delta_roue_droite, signed short delta_r
 }
 
 void mesure_odometre(void) {/*attention au type de variable!*/
-	//robot.GetSensorData(&sensors_data);
+	/*mesure la distance parcourue par les roues*/
+							//robot.GetSensorData(&sensors_data);
 
 	double delta_roue_droite = sensors_data.OdometryRight - old_droite;//calcul de la distance
 	double delta_roue_gauche = sensors_data.OdometryLeft - old_gauche;
@@ -267,7 +272,7 @@ void mesure_odometre(void) {/*attention au type de variable!*/
 	/*pas de remise à  ?*/
 }
 
-
+//extrait les positions de la structure
 double getx(position *p) {
 
 	return p->x;
@@ -279,4 +284,20 @@ double gety(position *p) {
 double getO(position *p) {
 
 	return p->O;
+}
+
+void verif_limites_xy(position *p) {
+	
+	if (p->x > lim_x) {//stop
+		Robot_Arreter(0, 0);
+	}
+	if (p->y > lim_y) {//alcove !
+		Robot_Arreter(0, 0);//tourner sur soit meme pour se remettre dans la bonne orientation
+		//à voir avec le vrai robot en test
+		//sans lui j'atteint mes limites à l'aveugle
+		p->O;
+	}
+	
+	
+	
 }

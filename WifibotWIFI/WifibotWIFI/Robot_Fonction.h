@@ -4,9 +4,9 @@
 
 typedef struct
 {
-	double x = 42;     /* en pulse */
-	double y = 46;
-	double O = 23;     /* en rad */
+	double x = 0;     /* en pulse */
+	double y = 0;
+	double O = 0;     /* en rad */
 } position;
 
 

@@ -28,6 +28,7 @@ void main(void)
 			Robot_Tourner_Gauche_avec_tick(50,-50,2000);
 			Robot_Avancer_avec_tick(50, 50, 5000);
 			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
+			/*utiliser l orientation à la place*/
 		}
 		
 		if (Robot_obstacleGauche()) {
@@ -35,6 +36,7 @@ void main(void)
 			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
 			Robot_Avancer_avec_tick(50, 50, 5000);
 			Robot_Tourner_Gauche_avec_tick(50, -50, 2000);
+			/*utiliser l orientation à la place*/
 		}
 		
 		Sleep(100);
