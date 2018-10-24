@@ -21,11 +21,9 @@ void main(void)
 	while(1)
 	{
 		updatesensors();
-
+		mesure_odometre();
 		Robot_Avancer(255, 255);
 		
-		
-	
 		if(Robot_obstacleDroite()) {
 			//Robot_Tourner_Gauche(255, 0);
 			Robot_Tourner_Gauche_avec_tick(50,-50,2000);
