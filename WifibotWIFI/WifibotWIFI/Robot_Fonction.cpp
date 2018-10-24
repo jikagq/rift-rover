@@ -123,7 +123,8 @@ void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {
 
 		Robot_Avancer(vitesse_gauche, vitesse_droite);
-		robot.GetSensorData(&sensors_data);//aquisition
+		//robot.GetSensorData(&sensors_data);//aquisition
+		updatesensors();
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		Sleep(100);
@@ -147,7 +148,8 @@ void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {
 
 		Robot_Tourner_Gauche(vitesse_gauche, vitesse_droite);
-		robot.GetSensorData(&sensors_data);//aquisition
+		//robot.GetSensorData(&sensors_data);//aquisition
+		updatesensors();
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		Sleep(100);
@@ -170,7 +172,8 @@ void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 	while ((val_tick_gauche < consigne_tick + val_tick_gauche_depart) && (val_tick_droite < consigne_tick + val_tick_droite_depart)) {
 
 		Robot_Tourner_Droite(vitesse_gauche, vitesse_droite);
-		robot.GetSensorData(&sensors_data);//aquisition
+		//robot.GetSensorData(&sensors_data);//aquisition
+		updatesensors();
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		Sleep(100);
@@ -186,6 +189,7 @@ void updatesensors(void) {
 	printf("odoLeft : %d\n", sensors_data.OdometryLeft);
 	printf("odoRight : %d\n", sensors_data.OdometryRight);
 	
+	mesure_odometre();//a chaque apel mesure des nouvelles coordonées
 	printf("x : %f\n", getx(&pos));
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
@@ -252,15 +256,15 @@ void odometrie(position *p, signed short delta_roue_droite, signed short delta_r
 	calcul_position_arc(p, delta_distance, delta_angle);
 }
 
-void mesure_odometre(void) {
-	robot.GetSensorData(&sensors_data);
+void mesure_odometre(void) {/*attention au type de variable!*/
+	//robot.GetSensorData(&sensors_data);
 
 	double delta_roue_droite = sensors_data.OdometryRight - old_droite;//calcul de la distance
 	double delta_roue_gauche = sensors_data.OdometryLeft - old_gauche;
 
 	odometrie(&pos,  delta_roue_droite, delta_roue_gauche);
 	
-	Sleep(100);
+	/*pas de remise à  ?*/
 }
 
 

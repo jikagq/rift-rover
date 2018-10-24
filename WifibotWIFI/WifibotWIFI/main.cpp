@@ -20,8 +20,7 @@ void main(void)
 	/*..............*/
 	while(1)
 	{
-		updatesensors();
-		mesure_odometre();
+		updatesensors();//mise à jour des capteurs + des coordonées
 		Robot_Avancer(255, 255);
 		
 		if(Robot_obstacleDroite()) {
