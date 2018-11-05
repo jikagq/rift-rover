@@ -289,13 +289,30 @@ void verif_limites_xy(position *p) {
 	if (p->x > lim_x) {//stop
 		Robot_Arreter(0, 0);
 	}
-	if (p->y > lim_y) {//alcove !
+	if (p->y > lim_y) {//alcove ! en positif
 		Robot_Arreter(0, 0);//tourner sur soit meme pour se remettre dans la bonne orientation
 		//à voir avec le vrai robot en test
 		//sans lui j'atteint mes limites à l'aveugle
+
+		Robot_Tourner_Droite_avec_tick(-50, 50, 2000);// faire un 180°
+		//ou bien utiliser l'orientation si ça marche
+		//descendre en dessous de la limite en y d'environ la valeur limite
+		//tourner de 90° pour se remettre dans l'axe
+		//reprendre le fonctionnement normal et avancer
 		p->O;
 	}
 	
 	
 	
+	
+	
+	
+	
+	
+	/**if (p->y < lim_y) {//alcove ! en negatif
+		Robot_Arreter(0, 0);//tourner sur soit meme pour se remettre dans la bonne orientation
+		//à voir avec le vrai robot en test
+		//sans lui j'atteint mes limites à l'aveugle
+		p->O;
+	}**/
 }

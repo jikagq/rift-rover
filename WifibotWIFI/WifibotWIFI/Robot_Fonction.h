@@ -40,3 +40,5 @@ void mesure_odometre(void);
 double getx(position *p);
 double gety(position *p);
 double getO(position *p);
+
+void verif_limites_xy(position *p);
