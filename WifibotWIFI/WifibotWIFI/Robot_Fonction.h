@@ -1,6 +1,12 @@
 #include "WifibotClient.h"
 
+#define IP_ADRESSE "192.168.1.76"
+#define PORT	15020
+
+
 #pragma once
+
+
 
 typedef struct
 {

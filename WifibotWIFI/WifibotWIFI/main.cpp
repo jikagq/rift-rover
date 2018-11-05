@@ -1,11 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "WifibotClient.h"
-#include "Robot_Fonction.h"
 
-#define IP_ADRESSE "192.168.1.75"
-#define PORT	15020
+#include "Robot_Fonction.h"
+#include "WifibotClient.h"
+
 
 void main(void)
 {
@@ -21,14 +20,14 @@ void main(void)
 	while(1)
 	{
 		updatesensors();//mise à jour des capteurs + des coordonées
-		Robot_Avancer(255, 255);
+		Robot_Avancer(50, 50);
 		
 		if(Robot_obstacleDroite()) {
 			//Robot_Tourner_Gauche(255, 0);
 			Robot_Tourner_Gauche_avec_tick(50,-50,2000);
 			Robot_Avancer_avec_tick(50, 50, 5000);
 			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
-			/*utiliser l orientation à la place*/
+			
 		}
 		
 		if (Robot_obstacleGauche()) {
@@ -36,9 +35,9 @@ void main(void)
 			Robot_Tourner_Droite_avec_tick(-50, 50, 2000);
 			Robot_Avancer_avec_tick(50, 50, 5000);
 			Robot_Tourner_Gauche_avec_tick(50, -50, 2000);
-			/*utiliser l orientation à la place*/
+			
 		}
-		
+
 		Sleep(100);
 	}	
 }

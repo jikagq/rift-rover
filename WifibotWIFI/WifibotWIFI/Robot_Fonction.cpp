@@ -1,12 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "WifibotClient.h"
 #include "Robot_Fonction.h"
 
-
-#define IP_ADRESSE "192.168.1.75"
-#define PORT	15020
+WifibotClient robot;
+SensorData sensors_data;
 
 /*depart en 0,0 donc test d'une augmenation des valeur de +combien ?*/
 #define lim_x 10000
@@ -15,8 +13,7 @@
 
 position pos;//variable position de type pos
 
-WifibotClient robot;
-SensorData sensors_data;
+
 int IR_SEUIL = 100;
 
 double old_droite = 0;
@@ -195,8 +192,9 @@ void updatesensors(void) {
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
 	
+	//Sleep(100);
 	
-	verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
+	//verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
 }
 
 
