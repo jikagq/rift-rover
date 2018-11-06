@@ -18,7 +18,12 @@ int IR_SEUIL = 100;
 
 double old_droite = 0;
 double old_gauche = 0;
-int entraxe = 10;//mesure entraxe des roues
+
+double delta_roue_droite = 0;
+double delta_roue_gauche = 0;
+
+int entraxe = 30;//mesure entraxe des roues
+int cpt = 0;
 
 
 void Robot_Connexion()
@@ -33,7 +38,13 @@ void Robot_Connexion()
 	else
 	{
 		printf("Connection established...\n");
+		inistruc(&pos);
+		//robot.GetSensorData(&sensors_data);
+		//sensors_data -> OdometryLeft = 0;
+		//sensors_data -> OdometryRight = 0;
 	}
+	
+
 }
 
 void Robot_Avancer(UINT16 vitesse_gauche, UINT16 vitesse_droite)
@@ -76,6 +87,7 @@ bool Robot_obstacleDroite()
 	{
 		return false;
 	}
+	
 }
 
 bool Robot_obstacleGauche()
@@ -127,7 +139,7 @@ void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		Sleep(100);
 	}
-	Robot_Arreter(0, 0);
+	//Robot_Arreter(0, 0);
 
 }
 
@@ -152,7 +164,7 @@ void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		Sleep(100);
 	}
-	Robot_Arreter(0, 0);
+	//Robot_Arreter(0, 0);
 }
 
 void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)//normalement fonctionne en relatif
@@ -176,14 +188,14 @@ void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		Sleep(100);
 	}
-	Robot_Arreter(0, 0);
+	//Robot_Arreter(0, 0);
 }
 
 void updatesensors(void) {
 	robot.GetSensorData(&sensors_data);
-	printf("Batterie : %d\n", sensors_data.BatVoltage);
+	/*printf("Batterie : %d\n", sensors_data.BatVoltage);
 	printf("IRLeft : %d\n", sensors_data.IRLeft);
-	printf("IRRight : %d\n", sensors_data.IRRight);
+	printf("IRRight : %d\n", sensors_data.IRRight);*/
 	printf("odoLeft : %d\n", sensors_data.OdometryLeft);
 	printf("odoRight : %d\n", sensors_data.OdometryRight);
 	
@@ -191,6 +203,10 @@ void updatesensors(void) {
 	printf("x : %f\n", getx(&pos));
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
+
+	//cpt++;
+
+	//printf("============cpt : %d\n", cpt);
 	
 	//Sleep(100);
 	
@@ -247,12 +263,12 @@ void calcul_position_arc(position *p, double distance, double angle)
 
 /* delta_roue_droite et delta_roue_gauche sont les distance en pulses
  * parcourue par les roues droite et gauche en un cycle */
-void odometrie(position *p, signed short delta_roue_droite, signed short delta_roue_gauche)
+void odometrie(position *p, double delta_roue_droite, double delta_roue_gauche)
 {
 	double delta_distance = 0, delta_angle = 0;
 
-	delta_distance = ((double)(delta_roue_droite + delta_roue_gauche)) / 2;
-	delta_angle = (double)(delta_roue_droite - delta_roue_gauche);
+	delta_distance = (double)((delta_roue_droite + delta_roue_gauche)) / 2;
+	delta_angle = (double) (delta_roue_droite - delta_roue_gauche);
 
 	//calcul_position_segment(p, delta_distance, delta_angle);
 	calcul_position_arc(p, delta_distance, delta_angle);
@@ -262,11 +278,29 @@ void mesure_odometre(void) {/*attention au type de variable!*/
 	/*mesure la distance parcourue par les roues*/
 							//robot.GetSensorData(&sensors_data);
 
-	double delta_roue_droite = sensors_data.OdometryRight - old_droite;//calcul de la distance
-	double delta_roue_gauche = sensors_data.OdometryLeft - old_gauche;
+	delta_roue_droite = sensors_data.OdometryRight - old_droite;//calcul de la distance
+	delta_roue_gauche = sensors_data.OdometryLeft - old_gauche;
 
-	odometrie(&pos,  delta_roue_droite, delta_roue_gauche);
+	printf("delta droite : %f\n", delta_roue_droite);
+	printf("delta gauche: %f\n", delta_roue_gauche);
+
+	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {
+		printf("bad\n");
+	}
+	else {
+		odometrie(&pos, delta_roue_droite, delta_roue_gauche);
+	}
+
 	
+
+	
+
+	old_droite = sensors_data.OdometryRight;
+	old_gauche = sensors_data.OdometryLeft;
+
+	delta_roue_droite = 0;
+	delta_roue_gauche = 0;
+
 	/*pas de remise à  ?*/
 }
 
@@ -315,4 +349,10 @@ void verif_limites_xy(position *p) {
 		//sans lui j'atteint mes limites à l'aveugle
 		p->O;
 	}**/
+}
+
+void inistruc(position *p) {
+	p->O = 0;
+	p->x = 0;
+	p->y = 0;
 }

@@ -1,6 +1,6 @@
 #include "WifibotClient.h"
 
-#define IP_ADRESSE "192.168.1.76"
+#define IP_ADRESSE "192.168.1.72"
 #define PORT	15020
 
 
@@ -14,6 +14,7 @@ typedef struct
 	double y = 0;
 	double O = 0;     /* en rad */
 } position;
+
 
 
 void Robot_Connexion();
@@ -34,7 +35,7 @@ void updatesensors(void);
 
 void calcul_position_segment(position *p, double distance, double angle);
 void calcul_position_arc(position *p, double distance, double angle);
-void odometrie(position *p, signed short delta_roue_droite, signed short delta_roue_gauche);
+void odometrie(position *p, double delta_roue_droite, double delta_roue_gauche);
 void mesure_odometre(void);
 
 double getx(position *p);
@@ -42,3 +43,6 @@ double gety(position *p);
 double getO(position *p);
 
 void verif_limites_xy(position *p);
+void inistruc(position *p);
+
+extern position pos;//variable position de type pos
