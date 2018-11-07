@@ -1,6 +1,6 @@
 #include "WifibotClient.h"
 
-#define IP_ADRESSE "192.168.1.72"
+#define IP_ADRESSE "192.168.1.76"
 #define PORT	15020
 
 
@@ -46,3 +46,11 @@ void verif_limites_xy(position *p);
 void inistruc(position *p);
 
 extern position pos;//variable position de type pos
+
+extern UINT16 vitesse_gauche;
+extern UINT16 vitesse_droite;
+
+/*pirate*/
+extern enum side_IRSens { RIGHT, LEFT };
+void move(int right, int left);
+int getDistance(side_IRSens side, int *LUT);

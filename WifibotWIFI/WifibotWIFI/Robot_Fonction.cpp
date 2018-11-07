@@ -7,8 +7,8 @@ WifibotClient robot;
 SensorData sensors_data;
 
 /*depart en 0,0 donc test d'une augmenation des valeur de +combien ?*/
-#define lim_x 10000
-#define lim_y 500
+#define lim_x 30000
+#define lim_y 5000
 
 
 position pos;//variable position de type pos
@@ -23,7 +23,11 @@ double delta_roue_droite = 0;
 double delta_roue_gauche = 0;
 
 int entraxe = 30;//mesure entraxe des roues
-int cpt = 0;
+
+double cpt_x = 0;//compteur en x negatif
+
+bool flag_correction = false;
+
 
 
 void Robot_Connexion()
@@ -38,13 +42,17 @@ void Robot_Connexion()
 	else
 	{
 		printf("Connection established...\n");
-		inistruc(&pos);
+		
 		//robot.GetSensorData(&sensors_data);
 		//sensors_data -> OdometryLeft = 0;
 		//sensors_data -> OdometryRight = 0;
 	}
-	
+}
 
+void inistruc(position *p) {
+	p->O = 0;
+	p->x = 0;
+	p->y = 0;
 }
 
 void Robot_Avancer(UINT16 vitesse_gauche, UINT16 vitesse_droite)
@@ -204,13 +212,11 @@ void updatesensors(void) {
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
 
-	//cpt++;
 
-	//printf("============cpt : %d\n", cpt);
 	
 	//Sleep(100);
 	
-	//verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
+	verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
 }
 
 
@@ -284,7 +290,7 @@ void mesure_odometre(void) {/*attention au type de variable!*/
 	printf("delta droite : %f\n", delta_roue_droite);
 	printf("delta gauche: %f\n", delta_roue_gauche);
 
-	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {
+	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {/*fix pour filter le pic ? (<25000) de la distance delta au démarrage du robot*/
 		printf("bad\n");
 	}
 	else {
@@ -319,40 +325,106 @@ double getO(position *p) {
 }
 
 void verif_limites_xy(position *p) {
-	
-	if (p->x > lim_x) {//stop
-		Robot_Arreter(0, 0);
-	}
-	if (p->y > lim_y) {//alcove ! en positif
-		Robot_Arreter(0, 0);//tourner sur soit meme pour se remettre dans la bonne orientation
-		//à voir avec le vrai robot en test
-		//sans lui j'atteint mes limites à l'aveugle
 
-		Robot_Tourner_Droite_avec_tick(-50, 50, 2000);// faire un 180°
-		//ou bien utiliser l'orientation si ça marche
-		//descendre en dessous de la limite en y d'environ la valeur limite
-		//tourner de 90° pour se remettre dans l'axe
-		//reprendre le fonctionnement normal et avancer
-		p->O;
+	/*remplacer tout les double en long ?*/
+	/*getx(&pos) à remplacer par p->x*/
+
+	/*fix pb des x negatif pour la distance*/
+	if (getx(&pos) < 0) {//si x est dans les -
+		/*il faut la valeur max a laquelle le robot est parti dans les négatifs*/
+		if (getx(&pos) < cpt_x) {
+			cpt_x = getx(&pos);//max en negatif ? what ?
+		}//pb si une seule valzur ?
+	}
+	
+	if ((abs((long)getx(&pos))+(abs((long)cpt_x))) > lim_x) { // à chaque passage on ajoute l'eventuelle derive en x négatif (cptx) au x positif
+		/*fix pour arreter le robot*/
+		while (1) {}//lol
 	}
 	
 	
+
+	/*detection en y*/
 	
+	/*ref en y=0 ?*/
 	
+	/*
+	if (p->y > lim_y) {//alcove ! en positif donc +roue droite
+		//Robot_Avancer(50, 150);
+		vitesse_gauche = 80;
+		vitesse_droite = 120;
+		flag_correction = true;
+	}
 	
+	if (p->y < (-lim_y)) {//alcove ! en negatif donc donc +roue gauche
+		//Robot_Avancer(150, 50);
+		vitesse_gauche =  120;
+		vitesse_droite =  80;
+		flag_correction = true;
+	}*/
+
+	/*fix pour la correction en y*/
+	/*pansement sur une jambe de bois...*/
+	/*if ((flag_correction == true) && (-20 <= p->y) && (p->y <= 20)) { //-20<0<20 -> milieu
+		/*la limite y à été atteinte et les vitesse ont été modifié donc correction de la trajectoire
+		on attend que le robot atteint le milieu du couloire pour se remttre dans l'axe et remmtre les vitesses nominales
+		*/
+		
+		// à voir avec l'orientation
+
+		/*while (p->O != "orientation de départ") {
+
+		}*/
+
+
+	/*	vitesse_gauche = 100;
+		vitesse_droite = 101;
+		flag_correction = false;// robot remis au milieu correction terminé
+	}
 	
-	
-	
-	/**if (p->y < lim_y) {//alcove ! en negatif
-		Robot_Arreter(0, 0);//tourner sur soit meme pour se remettre dans la bonne orientation
-		//à voir avec le vrai robot en test
-		//sans lui j'atteint mes limites à l'aveugle
-		p->O;
-	}**/
+	if ((p->y <= 20) && (p->y <= 20)) {
+
+	}*/
 }
 
-void inistruc(position *p) {
-	p->O = 0;
-	p->x = 0;
-	p->y = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*fonction pirates*/
+
+int getDistance(side_IRSens side, int *LUT)
+{
+	if (side == LEFT)
+	{
+		return LUT[sensors_data.IRLeft];
+	}
+	else
+	{
+		return LUT[sensors_data.IRRight];
+	}
+}
+
+void move(int right, int left) {
+	unsigned char flags = 128 + 32 + ((left >= 0) ? 1 : 0) * 64 + ((right >= 0) ? 1 : 0) * 16 + 1;
+	int r, l;
+
+	r = abs((int)(255 * right / 100.f));
+	l = abs((int)(255 * left / 100.f));
+	robot.SendCommand(r, l, flags);
+	
+	updatesensors();
+	Sleep(100);
 }
