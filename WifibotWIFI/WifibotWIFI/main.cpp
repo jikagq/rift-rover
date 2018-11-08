@@ -1,3 +1,4 @@
+/*https://github.com/jikagq/rift-rover*/
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,11 +6,8 @@
 #include "Robot_Fonction.h"
 #include "WifibotClient.h"
 
-UINT16 vitesse_gauche=100;
-UINT16 vitesse_droite=101;
-
-bool flag = false;
-long x_test = 0;
+bool flag = false; //permets de savoir si on vient d'éviter un obstacle
+//long x_test = 0;
 
 int SharpLUT[] = { 150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,103,102,101,100,99,
 		  96,95,90,88,87,86,85,84,83,82,81,80,79,77,75,74,73,72,71,70,69,68,67,66,65,65,64,64,63,62,61,61,60,60,59,59,58,58,57,57,56,56,56,55,55,55,54,54,54,53,
@@ -24,7 +22,7 @@ void main(void)
 	/* Connection to the robot */
 	/*.........................*/
 	Robot_Connexion();//connection au robot
-	inistruc(&pos);//initialisation de la structure à 0
+	inistruc(&pos);//initialisation de la structure xyO à 0
 	updatesensors();//mise à jour des capteurs + des coordonées /*inutile ?*/
 	//double x1 = getx(&pos);//sauvegarde de la 1ere valeur de x /*inutile car maintenant demarre directe à 0?*/
 
@@ -34,80 +32,52 @@ void main(void)
 	/*..............*/
 	while(1)
 	{
-		//Robot_Avancer(vitesse_gauche, vitesse_droite);
-		//updatesensors();//mise à jour des capteurs + des coordonées
-		
-
-		/*if (abs((long)getx(&pos))> 30000 ) {
-			Robot_Arreter;
-			while(1){}//lol
-			
-		}*/ /*inutile car directment dans verif fonction et update sensor*/
-		
-		/*if(Robot_obstacleDroite()) {
-			Robot_Tourner_Gauche(0, 50);
-		}
-		
-		if (Robot_obstacleGauche()) {
-			Robot_Tourner_Droite(50, 0);			
-		}*/
-		//system("cls");
-		//Sleep(100);
-
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		/*partie pirate*/
 		updatesensors();//mise à jour des capteurs + des coordonées
-		if ((getDistance(LEFT, SharpLUT) <= 60) && (getDistance(RIGHT, SharpLUT) <= 60))
+		if ((DistanceObstacle(LEFT, SharpLUT) <= 70) && (DistanceObstacle(RIGHT, SharpLUT) <= 70))
 		{
-			move(0, 0);
-			printf("STOP");
+			Deplacement(0, 0);
+			printf("stop");
 		}
-		else if ((getDistance(LEFT, SharpLUT) <= 60) && (getDistance(RIGHT, SharpLUT) >= 60))
+		else if ((DistanceObstacle(LEFT, SharpLUT) <= 70) && (DistanceObstacle(RIGHT, SharpLUT) >= 70))
 		{
-			move(-30, 30);
-			flag = true;
+			Deplacement(-30, 30);
+			flag = true;//si le robot à tourner c'est que il a detecté un osbtacle
 			//x_test = getx(&pos);
-			printf("LEFT");
+			printf("gauche");
 		}
-		else if ((getDistance(LEFT, SharpLUT) >= 60) && (getDistance(RIGHT, SharpLUT) <= 60))
+		else if ((DistanceObstacle(LEFT, SharpLUT) >= 70) && (DistanceObstacle(RIGHT, SharpLUT) <= 70))
 		{
-			move(30, -30);
-			flag = true;
+			Deplacement(30, -30);
+			flag = true;//si le robot à tourner c'est que il a detecté un osbtacle
 			//x_test = getx(&pos);
-			printf("RIGHT");
+			printf("droite");
 		}
-		else if ((getDistance(LEFT, SharpLUT) > 60) || (getDistance(RIGHT, SharpLUT) > 60))
+		else if ((DistanceObstacle(LEFT, SharpLUT) > 70) || (DistanceObstacle(RIGHT, SharpLUT) > 70))
 		{
-			move(30, 30);
-			printf("FORWARD");
-
-			if (flag == true) {//correction
+			Deplacement(30, 30);
+			printf("avance");
+			//une fois que les capteur ne detecte plus rien le robot avance
+			if (flag == true) {//si le robot à tourner c'est que il a detecté un osbtacle
 
 				//Sleep(500);
 				/*while (x_test < x_test + 1000) {
-					move(30, 30);
+					Deplacement(30, 30);
 				}*/
-				Robot_Avancer_avec_tick(50, 50, 3000);
-				while ((getO(&pos) <= -4.0) || (getO(&pos) >=0)) {
+				Robot_Avancer_avec_tick(50, 50, 3000);//donc on contourne l'obstacle pendant 3000 tick
+				while ((getO(&pos) <= -4.0) || (getO(&pos) >=0)) { // au démarage l'orientation est fixé à -0.75
+					/*si le robot tourne son orientation sera modifiée*/
+					/*le robot va tourner sur lui meme tant qu'il ne retombe pas dans une plage d'orientation incluant 0.75*/
 
 					if (getO(&pos) < -0.75) {
-						move(15, -15);
+						Deplacement(15, -15);//soit à gauche
 					}
 					else {
-						move(-15, 15);
+						Deplacement(-15, 15);//soit à droite
 					}
 				
 				}
 				Robot_Arreter(0,0);
-				flag = false;
+				flag = false;//lorsque l'obstacle est dépasser le robot reprend son chemin
 			}
 		}
 

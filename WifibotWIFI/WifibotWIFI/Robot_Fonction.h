@@ -33,7 +33,7 @@ void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 
 void updatesensors(void);
 
-void calcul_position_segment(position *p, double distance, double angle);
+
 void calcul_position_arc(position *p, double distance, double angle);
 void odometrie(position *p, double delta_roue_droite, double delta_roue_gauche);
 void mesure_odometre(void);
@@ -50,7 +50,7 @@ extern position pos;//variable position de type pos
 extern UINT16 vitesse_gauche;
 extern UINT16 vitesse_droite;
 
-/*pirate*/
+
 extern enum side_IRSens { RIGHT, LEFT };
-void move(int right, int left);
-int getDistance(side_IRSens side, int *LUT);
+void Deplacement(int right, int left);
+int DistanceObstacle(side_IRSens side, int *LUT);

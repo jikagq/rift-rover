@@ -7,14 +7,14 @@ WifibotClient robot;
 SensorData sensors_data;
 
 /*depart en 0,0 donc test d'une augmenation des valeur de +combien ?*/
-#define lim_x 30000
-#define lim_y 5000
+#define lim_x 25000 //limite d'arrivé au bout du couloir
+#define lim_y 5000 //deplacement autoriser en y
 
 
 position pos;//variable position de type pos
 
 
-int IR_SEUIL = 100;
+int IR_SEUIL = 100;/*legacy*/
 
 double old_droite = 0;
 double old_gauche = 0;
@@ -29,7 +29,7 @@ double cpt_x = 0;//compteur en x negatif
 bool flag_correction = false;
 
 
-
+/*legacy function*/
 void Robot_Connexion()
 {
 	bool rep = robot.ConnectToRobot(IP_ADRESSE, PORT);
@@ -49,7 +49,7 @@ void Robot_Connexion()
 	}
 }
 
-void inistruc(position *p) {
+void inistruc(position *p) {/*initialisation de la structure*/
 	p->O = 0;
 	p->x = 0;
 	p->y = 0;
@@ -127,7 +127,7 @@ bool Detection_obstacle()
 }
 
 
-void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)
+void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)/*permet d'avancer pendant un nombre de tick*/
 {
 	int val_tick_droite = 0;
 	int val_tick_gauche = 0;
@@ -138,11 +138,11 @@ void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 	val_tick_droite = val_tick_droite_depart = sensors_data.OdometryRight;//actualisation
 	val_tick_gauche = val_tick_gauche_depart = sensors_data.OdometryLeft;//actualisation
 
-	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {
+	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {//tant que la consigne n'a pas été ateinte
 
 		Robot_Avancer(vitesse_gauche, vitesse_droite);
 		//robot.GetSensorData(&sensors_data);//aquisition
-		updatesensors();
+		updatesensors();//mise à jour des capteurs
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		Sleep(100);
@@ -201,9 +201,9 @@ void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 
 void updatesensors(void) {
 	robot.GetSensorData(&sensors_data);
-	/*printf("Batterie : %d\n", sensors_data.BatVoltage);
+	printf("Batterie : %d\n", sensors_data.BatVoltage);
 	printf("IRLeft : %d\n", sensors_data.IRLeft);
-	printf("IRRight : %d\n", sensors_data.IRRight);*/
+	printf("IRRight : %d\n", sensors_data.IRRight);
 	printf("odoLeft : %d\n", sensors_data.OdometryLeft);
 	printf("odoRight : %d\n", sensors_data.OdometryRight);
 	
@@ -220,19 +220,7 @@ void updatesensors(void) {
 }
 
 
-
-
-
 //http://geonobotwiki.free.fr/doku.php?id=robotics:odometrie
-
-/* mise a jour la nouvelle position du robot (x, y, O)
- * par approximation de segment de droite */
-void calcul_position_segment(position *p, double distance, double angle)/*pas utiliser ici*/
-{
-	p->x += distance * cos(p->O);
-	p->y += distance * sin(p->O);
-	p->O += angle / entraxe; //atan2(angle, entraxe);
-}
 
 /* mise a jour de la nouvelle position du robot (x, y, O)
  * par approximation d'arc de cercle */
@@ -276,41 +264,35 @@ void odometrie(position *p, double delta_roue_droite, double delta_roue_gauche)
 	delta_distance = (double)((delta_roue_droite + delta_roue_gauche)) / 2;
 	delta_angle = (double) (delta_roue_droite - delta_roue_gauche);
 
-	//calcul_position_segment(p, delta_distance, delta_angle);
+	
 	calcul_position_arc(p, delta_distance, delta_angle);
 }
 
-void mesure_odometre(void) {/*attention au type de variable!*/
-	/*mesure la distance parcourue par les roues*/
-							//robot.GetSensorData(&sensors_data);
+void mesure_odometre(void) {
+	/*mesure la distance parcourue par les deux trains de roues*/
+			
 
 	delta_roue_droite = sensors_data.OdometryRight - old_droite;//calcul de la distance
 	delta_roue_gauche = sensors_data.OdometryLeft - old_gauche;
 
-	printf("delta droite : %f\n", delta_roue_droite);
-	printf("delta gauche: %f\n", delta_roue_gauche);
+	//printf("delta droite : %f\n", delta_roue_droite);
+	//printf("delta gauche: %f\n", delta_roue_gauche);
 
-	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {/*fix pour filter le pic ? (<25000) de la distance delta au démarrage du robot*/
+	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {/*fix pour filter le pic des odomètres ? (<25000) de la distance delta au démarrage du robot*/
 		printf("bad\n");
 	}
 	else {
 		odometrie(&pos, delta_roue_droite, delta_roue_gauche);
 	}
 
-	
-
-	
-
 	old_droite = sensors_data.OdometryRight;
 	old_gauche = sensors_data.OdometryLeft;
 
 	delta_roue_droite = 0;
 	delta_roue_gauche = 0;
-
-	/*pas de remise à  ?*/
 }
 
-//extrait les positions de la structure
+/*accés à la structure*/
 double getx(position *p) {
 
 	return p->x;
@@ -324,17 +306,15 @@ double getO(position *p) {
 	return p->O;
 }
 
-void verif_limites_xy(position *p) {
+void verif_limites_xy(position *p) {/*vérifie que le robot n'atteint pas une limite en x et en y*/
 
 	/*remplacer tout les double en long ?*/
-	/*getx(&pos) à remplacer par p->x*/
-
 	/*fix pb des x negatif pour la distance*/
 	if (getx(&pos) < 0) {//si x est dans les -
 		/*il faut la valeur max a laquelle le robot est parti dans les négatifs*/
 		if (getx(&pos) < cpt_x) {
 			cpt_x = getx(&pos);//max en negatif ? what ?
-		}//pb si une seule valzur ?
+		}//pb si une seule valeur ?
 	}
 	
 	if ((abs((long)getx(&pos))+(abs((long)cpt_x))) > lim_x) { // à chaque passage on ajoute l'eventuelle derive en x négatif (cptx) au x positif
@@ -342,10 +322,7 @@ void verif_limites_xy(position *p) {
 		while (1) {}//lol
 	}
 	
-	
-
 	/*detection en y*/
-	
 	/*ref en y=0 ?*/
 	
 	/*
@@ -388,24 +365,7 @@ void verif_limites_xy(position *p) {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*fonction pirates*/
-
-int getDistance(side_IRSens side, int *LUT)
+int DistanceObstacle(side_IRSens side, int *LUT)/*renvoie la distance de l'obstacle grace à la look up table*/
 {
 	if (side == LEFT)
 	{
@@ -417,13 +377,13 @@ int getDistance(side_IRSens side, int *LUT)
 	}
 }
 
-void move(int right, int left) {
+void Deplacement(int right, int left) {/**/
 	unsigned char flags = 128 + 32 + ((left >= 0) ? 1 : 0) * 64 + ((right >= 0) ? 1 : 0) * 16 + 1;
-	int r, l;
+	int droite, gauche;
 
-	r = abs((int)(255 * right / 100.f));
-	l = abs((int)(255 * left / 100.f));
-	robot.SendCommand(r, l, flags);
+	droite = abs((int)(255 * right / 100.f));
+	gauche = abs((int)(255 * left / 100.f));
+	robot.SendCommand(droite, gauche, flags);
 	
 	updatesensors();
 	Sleep(100);
