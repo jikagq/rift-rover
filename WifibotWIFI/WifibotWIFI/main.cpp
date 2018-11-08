@@ -3,10 +3,11 @@
 #include <stdlib.h>
 
 
+
 #include "Robot_Fonction.h"
 #include "WifibotClient.h"
 
-bool flag = false; //permets de savoir si on vient d'éviter un obstacle
+bool flag = false; //permets de savoir si on vient d'Ã©viter un obstacle
 //long x_test = 0;
 
 int SharpLUT[] = { 150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,103,102,101,100,99,
@@ -16,23 +17,27 @@ int SharpLUT[] = { 150,150,150,150,150,150,150,150,150,150,150,150,150,150,150,1
 		  30,29,29,29,29,29,29,29,28,28,28,28,28,28,27,27,27,27,27,27,27,26,26,26,26,25,25,25,25,25,25,24,24,24,24,24,23,23,23,
 		  23,23,23,22,22,22,22,22,21,21,21,21,21,21,20,20,20,20,19,19,19,19,19,19,18,18,18,18,18,18,17,17,17,16,16,15,15 };
 
+
 void main(void)
 {
 	/*.........................*/
 	/* Connection to the robot */
 	/*.........................*/
+
 	Robot_Connexion();//connection au robot
-	inistruc(&pos);//initialisation de la structure xyO à 0
-	updatesensors();//mise à jour des capteurs + des coordonées /*inutile ?*/
-	//double x1 = getx(&pos);//sauvegarde de la 1ere valeur de x /*inutile car maintenant demarre directe à 0?*/
+	inistruc(&pos);//initialisation de la structure xyO Ã  0
+	updatesensors();//mise Ã  jour des capteurs + des coordonÃ©es /*inutile ?*/
+	//double x1 = getx(&pos);//sauvegarde de la 1ere valeur de x /*inutile car maintenant demarre directe Ã  0?*/
+
 
 
 	/*..............*/
 	/* Main program */
 	/*..............*/
+
 	while(1)
 	{
-		updatesensors();//mise à jour des capteurs + des coordonées
+		updatesensors();//mise Ã  jour des capteurs + des coordonÃ©es
 		if ((DistanceObstacle(LEFT, SharpLUT) <= 70) && (DistanceObstacle(RIGHT, SharpLUT) <= 70))
 		{
 			Deplacement(0, 0);
@@ -41,14 +46,14 @@ void main(void)
 		else if ((DistanceObstacle(LEFT, SharpLUT) <= 70) && (DistanceObstacle(RIGHT, SharpLUT) >= 70))
 		{
 			Deplacement(-30, 30);
-			flag = true;//si le robot à tourner c'est que il a detecté un osbtacle
+			flag = true;//si le robot Ã  tourner c'est que il a detectÃ© un osbtacle
 			//x_test = getx(&pos);
 			printf("gauche");
 		}
 		else if ((DistanceObstacle(LEFT, SharpLUT) >= 70) && (DistanceObstacle(RIGHT, SharpLUT) <= 70))
 		{
 			Deplacement(30, -30);
-			flag = true;//si le robot à tourner c'est que il a detecté un osbtacle
+			flag = true;//si le robot Ã  tourner c'est que il a detectÃ© un osbtacle
 			//x_test = getx(&pos);
 			printf("droite");
 		}
@@ -57,33 +62,34 @@ void main(void)
 			Deplacement(30, 30);
 			printf("avance");
 			//une fois que les capteur ne detecte plus rien le robot avance
-			if (flag == true) {//si le robot à tourner c'est que il a detecté un osbtacle
+			if (flag == true) {//si le robot Ã  tourner c'est que il a detectÃ© un osbtacle
 
 				//Sleep(500);
 				/*while (x_test < x_test + 1000) {
 					Deplacement(30, 30);
 				}*/
 				Robot_Avancer_avec_tick(50, 50, 3000);//donc on contourne l'obstacle pendant 3000 tick
-				while ((getO(&pos) <= -4.0) || (getO(&pos) >=0)) { // au démarage l'orientation est fixé à -0.75
-					/*si le robot tourne son orientation sera modifiée*/
+				while ((getO(&pos) <= -4.0) || (getO(&pos) >=0)) { // au dÃ©marage l'orientation est fixÃ© Ã  -0.75
+					/*si le robot tourne son orientation sera modifiÃ©e*/
 					/*le robot va tourner sur lui meme tant qu'il ne retombe pas dans une plage d'orientation incluant 0.75*/
 
 					if (getO(&pos) < -0.75) {
-						Deplacement(15, -15);//soit à gauche
+						Deplacement(15, -15);//soit Ã  gauche
 					}
 					else {
-						Deplacement(-15, 15);//soit à droite
+						Deplacement(-15, 15);//soit Ã  droite
 					}
 				
 				}
 				Robot_Arreter(0,0);
-				flag = false;//lorsque l'obstacle est dépasser le robot reprend son chemin
+				flag = false;//lorsque l'obstacle est dÃ©passer le robot reprend son chemin
 			}
 		}
 
 		
 
 		Sleep(100);
+
 	}	
 }
 

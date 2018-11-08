@@ -1,13 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "Robot_Fonction.h"
 
 WifibotClient robot;
 SensorData sensors_data;
 
 /*depart en 0,0 donc test d'une augmenation des valeur de +combien ?*/
-#define lim_x 25000 //limite d'arrivé au bout du couloir
+#define lim_x 25000 //limite d'arrivï¿½ au bout du couloir
 #define lim_y 5000 //deplacement autoriser en y
 
 
@@ -30,6 +31,7 @@ bool flag_correction = false;
 
 
 /*legacy function*/
+
 void Robot_Connexion()
 {
 	bool rep = robot.ConnectToRobot(IP_ADRESSE, PORT);
@@ -42,6 +44,7 @@ void Robot_Connexion()
 	else
 	{
 		printf("Connection established...\n");
+
 		
 		//robot.GetSensorData(&sensors_data);
 		//sensors_data -> OdometryLeft = 0;
@@ -54,6 +57,7 @@ void inistruc(position *p) {/*initialisation de la structure*/
 	p->x = 0;
 	p->y = 0;
 }
+
 
 void Robot_Avancer(UINT16 vitesse_gauche, UINT16 vitesse_droite)
 {
@@ -95,7 +99,6 @@ bool Robot_obstacleDroite()
 	{
 		return false;
 	}
-	
 }
 
 bool Robot_obstacleGauche()
@@ -109,6 +112,7 @@ bool Robot_obstacleGauche()
 		return false;
 	}
 }
+
 
 bool Detection_obstacle()
 {
@@ -138,11 +142,11 @@ void Robot_Avancer_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int c
 	val_tick_droite = val_tick_droite_depart = sensors_data.OdometryRight;//actualisation
 	val_tick_gauche = val_tick_gauche_depart = sensors_data.OdometryLeft;//actualisation
 
-	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {//tant que la consigne n'a pas été ateinte
+	while ((val_tick_droite < consigne_tick + val_tick_droite_depart) && (val_tick_gauche < consigne_tick + val_tick_gauche_depart)) {//tant que la consigne n'a pas ï¿½tï¿½ ateinte
 
 		Robot_Avancer(vitesse_gauche, vitesse_droite);
 		//robot.GetSensorData(&sensors_data);//aquisition
-		updatesensors();//mise à jour des capteurs
+		updatesensors();//mise ï¿½ jour des capteurs
 		val_tick_droite = sensors_data.OdometryRight;//actualisation
 		val_tick_gauche = sensors_data.OdometryLeft;//actualisation
 		Sleep(100);
@@ -155,7 +159,7 @@ void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 {
 	int val_tick_droite = 0;
 	int val_tick_droite_depart = 0;
-	int val_tick_gauche = 0; //variable du tick mesuré
+	int val_tick_gauche = 0; //variable du tick mesurï¿½
 	int val_tick_gauche_depart = 0;
 
 	robot.GetSensorData(&sensors_data);//aquisition
@@ -177,7 +181,7 @@ void Robot_Tourner_Gauche_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite
 
 void Robot_Tourner_Droite_avec_tick(UINT16 vitesse_gauche, UINT16 vitesse_droite, int consigne_tick)//normalement fonctionne en relatif
 {
-	int val_tick_gauche = 0; //variable du tick mesuré
+	int val_tick_gauche = 0; //variable du tick mesurï¿½
 	int val_tick_gauche_depart = 0;
 
 	int val_tick_droite = 0;
@@ -207,7 +211,7 @@ void updatesensors(void) {
 	printf("odoLeft : %d\n", sensors_data.OdometryLeft);
 	printf("odoRight : %d\n", sensors_data.OdometryRight);
 	
-	mesure_odometre();//a chaque apel mesure des nouvelles coordonées
+	mesure_odometre();//a chaque apel mesure des nouvelles coordonï¿½es
 	printf("x : %f\n", getx(&pos));
 	printf("y : %f\n", gety(&pos));
 	printf("O: %f\n", getO(&pos));
@@ -216,7 +220,7 @@ void updatesensors(void) {
 	
 	//Sleep(100);
 	
-	verif_limites_xy(&pos);//vérifie si le robot a atteint une limite à chaque mise à jour des coordonées
+	verif_limites_xy(&pos);//vï¿½rifie si le robot a atteint une limite ï¿½ chaque mise ï¿½ jour des coordonï¿½es
 }
 
 
@@ -228,7 +232,7 @@ void calcul_position_arc(position *p, double distance, double angle)
 {
 	/* rayon et angle de l'arc de cercle */
 	double r, a;
-	/* coordonnées du centre de l'arc de cercle */
+	/* coordonnï¿½es du centre de l'arc de cercle */
 	double xo, yo;
 
 	if (angle == 0)
@@ -238,7 +242,7 @@ void calcul_position_arc(position *p, double distance, double angle)
 	}
 	else
 	{
-		/* calcul des caractéristiques de l'arc de cercle */
+		/* calcul des caractï¿½ristiques de l'arc de cercle */
 		a = angle / entraxe;
 		r = distance / a;
 
@@ -278,7 +282,7 @@ void mesure_odometre(void) {
 	//printf("delta droite : %f\n", delta_roue_droite);
 	//printf("delta gauche: %f\n", delta_roue_gauche);
 
-	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {/*fix pour filter le pic des odomètres ? (<25000) de la distance delta au démarrage du robot*/
+	if ((delta_roue_droite > 500) || (delta_roue_droite > 500)) {/*fix pour filter le pic des odomï¿½tres ? (<25000) de la distance delta au dï¿½marrage du robot*/
 		printf("bad\n");
 	}
 	else {
@@ -292,7 +296,7 @@ void mesure_odometre(void) {
 	delta_roue_gauche = 0;
 }
 
-/*accés à la structure*/
+/*accï¿½s ï¿½ la structure*/
 double getx(position *p) {
 
 	return p->x;
@@ -306,18 +310,18 @@ double getO(position *p) {
 	return p->O;
 }
 
-void verif_limites_xy(position *p) {/*vérifie que le robot n'atteint pas une limite en x et en y*/
+void verif_limites_xy(position *p) {/*vï¿½rifie que le robot n'atteint pas une limite en x et en y*/
 
 	/*remplacer tout les double en long ?*/
 	/*fix pb des x negatif pour la distance*/
 	if (getx(&pos) < 0) {//si x est dans les -
-		/*il faut la valeur max a laquelle le robot est parti dans les négatifs*/
+		/*il faut la valeur max a laquelle le robot est parti dans les nï¿½gatifs*/
 		if (getx(&pos) < cpt_x) {
 			cpt_x = getx(&pos);//max en negatif ? what ?
 		}//pb si une seule valeur ?
 	}
 	
-	if ((abs((long)getx(&pos))+(abs((long)cpt_x))) > lim_x) { // à chaque passage on ajoute l'eventuelle derive en x négatif (cptx) au x positif
+	if ((abs((long)getx(&pos))+(abs((long)cpt_x))) > lim_x) { // ï¿½ chaque passage on ajoute l'eventuelle derive en x nï¿½gatif (cptx) au x positif
 		/*fix pour arreter le robot*/
 		while (1) {}//lol
 	}
@@ -343,20 +347,20 @@ void verif_limites_xy(position *p) {/*vérifie que le robot n'atteint pas une lim
 	/*fix pour la correction en y*/
 	/*pansement sur une jambe de bois...*/
 	/*if ((flag_correction == true) && (-20 <= p->y) && (p->y <= 20)) { //-20<0<20 -> milieu
-		/*la limite y à été atteinte et les vitesse ont été modifié donc correction de la trajectoire
+		/*la limite y ï¿½ ï¿½tï¿½ atteinte et les vitesse ont ï¿½tï¿½ modifiï¿½ donc correction de la trajectoire
 		on attend que le robot atteint le milieu du couloire pour se remttre dans l'axe et remmtre les vitesses nominales
 		*/
 		
-		// à voir avec l'orientation
+		// ï¿½ voir avec l'orientation
 
-		/*while (p->O != "orientation de départ") {
+		/*while (p->O != "orientation de dï¿½part") {
 
 		}*/
 
 
 	/*	vitesse_gauche = 100;
 		vitesse_droite = 101;
-		flag_correction = false;// robot remis au milieu correction terminé
+		flag_correction = false;// robot remis au milieu correction terminï¿½
 	}
 	
 	if ((p->y <= 20) && (p->y <= 20)) {
@@ -365,7 +369,7 @@ void verif_limites_xy(position *p) {/*vérifie que le robot n'atteint pas une lim
 }
 
 
-int DistanceObstacle(side_IRSens side, int *LUT)/*renvoie la distance de l'obstacle grace à la look up table*/
+int DistanceObstacle(side_IRSens side, int *LUT)/*renvoie la distance de l'obstacle grace ï¿½ la look up table*/
 {
 	if (side == LEFT)
 	{
@@ -387,4 +391,5 @@ void Deplacement(int right, int left) {/**/
 	
 	updatesensors();
 	Sleep(100);
+
 }

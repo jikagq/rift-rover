@@ -15,8 +15,6 @@ typedef struct
 	double O = 0;     /* en rad */
 } position;
 
-
-
 void Robot_Connexion();
 void Robot_Avancer(UINT16 vitesse_gauche, UINT16 vitesse_droite);
 void Robot_Reculer(UINT16 vitesse_gauche, UINT16 vitesse_droite);
@@ -54,3 +52,4 @@ extern UINT16 vitesse_droite;
 extern enum side_IRSens { RIGHT, LEFT };
 void Deplacement(int right, int left);
 int DistanceObstacle(side_IRSens side, int *LUT);
+
